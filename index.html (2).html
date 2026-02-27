@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>안중근 평화 마라톤 당일 동선</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; display: flex; height: 100vh; overflow: hidden; background: #f5f5f5; }
+
+  /* Sidebar */
+  .sidebar { width: 380px; min-width: 380px; height: 100vh; overflow-y: auto; background: #fff; border-right: 1px solid #e0e0e0; }
+  .sidebar-header { background: linear-gradient(135deg, #1B4F72, #2E86C1); color: #fff; padding: 24px 20px; }
+  .sidebar-header h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .sidebar-header p { font-size: 13px; opacity: 0.85; }
+  .sidebar-narrative { padding: 14px 20px; font-size: 13px; color: #666; background: #f9fafb; border-bottom: 1px solid #eee; line-height: 1.6; }
+
+  /* Timeline */
+  .timeline { padding: 16px 20px; }
+  .day-title { font-size: 14px; font-weight: 700; color: #1B4F72; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .day-title::before { content: ''; width: 4px; height: 18px; background: #2E86C1; border-radius: 2px; }
+
+  .stop { display: flex; gap: 14px; margin-bottom: 0; position: relative; }
+  .stop-line { display: flex; flex-direction: column; align-items: center; width: 32px; min-width: 32px; }
+  .stop-dot { width: 32px; height: 32px; border-radius: 50%; background: #2E86C1; color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; z-index: 1; }
+  .stop-dot.food { background: #E67E22; }
+  .stop-dot.end { background: #95A5A6; }
+  .stop-connector { width: 2px; flex: 1; background: #dde4ea; margin: 2px 0; }
+
+  .stop-content { flex: 1; padding-bottom: 20px; }
+  .stop-time { font-size: 12px; color: #2E86C1; font-weight: 600; margin-bottom: 2px; }
+  .stop-name { font-size: 14px; font-weight: 600; color: #1a1a1a; margin-bottom: 4px; }
+  .stop-notes { font-size: 12.5px; color: #666; line-height: 1.5; }
+  .stop-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+  .stop-meta span { font-size: 11px; color: #999; display: flex; align-items: center; gap: 3px; }
+
+  .stop:last-child .stop-connector { display: none; }
+  .stop:last-child .stop-content { padding-bottom: 8px; }
+
+  /* Map */
+  #map { flex: 1; height: 100vh; }
+
+  /* Custom marker */
+  .custom-marker { background: #2E86C1; color: #fff; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+  .custom-marker.food { background: #E67E22; }
+  .custom-marker.end { background: #95A5A6; }
+
+  /* Popup */
+  .leaflet-popup-content { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans KR', sans-serif; }
+  .popup-title { font-weight: 700; font-size: 14px; color: #1B4F72; margin-bottom: 4px; }
+  .popup-desc { font-size: 12px; color: #555; line-height: 1.5; }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    body { flex-direction: column; }
+    .sidebar { width: 100%; min-width: unset; height: 45vh; }
+    #map { height: 55vh; }
+  }
+
+  /* Scrollbar */
+  .sidebar::-webkit-scrollbar { width: 6px; }
+  .sidebar::-webkit-scrollbar-track { background: transparent; }
+  .sidebar::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+  .sidebar::-webkit-scrollbar-thumb:hover { background: #aaa; }
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-header">
+    <h1>🏃 안중근 평화 마라톤 당일 동선</h1>
+    <p>2026년 3월 1일(일) · 서울 상암월드컵공원</p>
+  </div>
+  <div class="sidebar-narrative">
+    각자 월드컵경기장역 도착 → 평화광장에서 배번호 수령 및 준비 → 08:00 집결 → 마라톤 → 식사 → 해산
+  </div>
+  <div class="timeline">
+    <div class="day-title">마라톤 당일 동선</div>
+
+    <div class="stop" data-index="0">
+      <div class="stop-line">
+        <div class="stop-dot">1</div>
+        <div class="stop-connector"></div>
+      </div>
+      <div class="stop-content">
+        <div class="stop-time">7:30 AM</div>
+        <div class="stop-name">월드컵경기장역 1번 출구 (각자 도착)</div>
+        <div class="stop-notes">~07:30 각자 도착 후 평화광장으로 이동</div>
+        <div class="stop-meta">
+          <span>⏱ 약 10분 소요</span>
+          <span>🚶 도보 650m</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-index="1">
+      <div class="stop-line">
+        <div class="stop-dot">2</div>
+        <div class="stop-connector"></div>
+      </div>
+      <div class="stop-content">
+        <div class="stop-time">7:45 AM ~ 10:30 AM</div>
+        <div class="stop-name">평화광장 — 배번호 수령 & 08:00 집결</div>
+        <div class="stop-notes">배번호 수령 → 환복 → 08:00 출발 대기장 앞 조원 집결 → 09:00 출발!</div>
+        <div class="stop-meta">
+          <span>🏅 마라톤 출발 09:00</span>
+          <span>💧 2.5km마다 급수대</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-index="2">
+      <div class="stop-line">
+        <div class="stop-dot food">3</div>
+        <div class="stop-connector"></div>
+      </div>
+      <div class="stop-content">
+        <div class="stop-time">11:10 AM</div>
+        <div class="stop-name">🍲 상암양평해장국 (식사)</div>
+        <div class="stop-notes">마라톤 후 따뜻한 해장국으로 피로 회복! 선지해장국 추천</div>
+        <div class="stop-meta">
+          <span>⭐ 3.9 (460+)</span>
+          <span>⏱ 약 80분</span>
+          <span>🕐 일요일 ~22:00</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stop" data-index="3">
+      <div class="stop-line">
+        <div class="stop-dot end">4</div>
+      </div>
+      <div class="stop-content">
+        <div class="stop-time">12:30 PM</div>
+        <div class="stop-name">월드컵경기장역 (해산)</div>
+        <div class="stop-notes">식사 후 각자 귀가</div>
+        <div class="stop-meta">
+          <span>🚇 6호선</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="map"></div>
+
+<script>
+const stops = [
+  { lat: 37.5697, lng: 126.8991, name: '월드컵경기장역 1번 출구', desc: '~07:30 각자 도착 후 평화광장으로 이동', cls: '' },
+  { lat: 37.5678, lng: 126.8937, name: '평화광장 (배번호 수령 & 08:00 집결)', desc: '배번호 수령 → 환복 → 08:00 집결 → 09:00 출발!', cls: '' },
+  { lat: 37.5777, lng: 126.8949, name: '상암양평해장국', desc: '선지해장국 추천 / 일요일 ~22:00', cls: 'food' },
+  { lat: 37.5697, lng: 126.8991, name: '월드컵경기장역 (해산)', desc: '12:30~ 식사 후 각자 귀가', cls: 'end' }
+];
+
+// Init map
+const map = L.map('map', { zoomControl: true }).setView([37.573, 126.894], 15);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap',
+  maxZoom: 19
+}).addTo(map);
+
+// Draw route line
+const routeCoords = stops.map(s => [s.lat, s.lng]);
+L.polyline(routeCoords, { color: '#2E86C1', weight: 4, opacity: 0.8, dashArray: '8, 8' }).addTo(map);
+
+// Add markers
+const markers = stops.map((s, i) => {
+  const icon = L.divIcon({
+    className: '',
+    html: `<div class="custom-marker ${s.cls}">${i + 1}</div>`,
+    iconSize: [28, 28],
+    iconAnchor: [14, 14]
+  });
+  const marker = L.marker([s.lat, s.lng], { icon })
+    .addTo(map)
+    .bindPopup(`<div class="popup-title">${s.name}</div><div class="popup-desc">${s.desc}</div>`);
+  return marker;
+});
+
+// Fit bounds
+const group = L.featureGroup(markers);
+map.fitBounds(group.getBounds().pad(0.15));
+
+// Sidebar click interaction
+document.querySelectorAll('.stop').forEach(el => {
+  el.style.cursor = 'pointer';
+  el.addEventListener('click', () => {
+    const idx = parseInt(el.dataset.index);
+    const s = stops[idx];
+    map.flyTo([s.lat, s.lng], 17, { duration: 0.8 });
+    markers[idx].openPopup();
+  });
+});
+</script>
+</body>
+</html>
